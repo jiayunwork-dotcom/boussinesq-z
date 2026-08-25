@@ -91,16 +91,6 @@ func SumRatio(first, second []Force) (float64, error) {
 	return firstSum / secondSum, nil
 }
 
-func fieldOrForceCoords(force Force, fieldZ, fieldR float64) (float64, float64) {
-	_ = fieldZ
-	_ = fieldR
-	return force.Z, force.R
-}
-
-func fieldKey(z, r float64) [2]float64 {
-	return [2]float64{z, r}
-}
-
 func pointVertical(P, z, r float64) (float64, error) {
 	load := Force{P: P, Z: z, R: r}
 	return load.VerticalStress()
