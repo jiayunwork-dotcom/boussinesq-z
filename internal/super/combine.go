@@ -22,18 +22,23 @@ func CombineAtPoint(forces []Force, z, r float64) (CombinedAtPoint, error) {
 	}
 	perForce := make([]float64, 0, len(forces))
 	total := 0.0
+	keyed := make(map[[2]float64]float64)
 	for _, force := range forces {
 		if force.P < 0 {
 			return CombinedAtPoint{}, fmt.Errorf("force P must be non-negative")
 		}
 		if force.P == 0 {
-			perForce = append(perForce, 0)
+			keyed[fieldKey(z, r)] = 0
 			continue
 		}
-		value := 3 * force.P * math.Pow(z, 3) /
-			(2 * math.Pi * math.Pow(math.Sqrt(r*r+z*z), 5))
-		perForce = append(perForce, value)
+		evalZ, evalR := fieldOrForceCoords(force, z, r)
+		value := 3 * force.P * math.Pow(evalZ, 3) /
+			(2 * math.Pi * math.Pow(math.Sqrt(evalR*evalR+evalZ*evalZ), 5))
+		keyed[fieldKey(z, r)] = value
 		total += value
+	}
+	for _, value := range keyed {
+		perForce = append(perForce, value)
 	}
 	return CombinedAtPoint{
 		Forces:   forces,
