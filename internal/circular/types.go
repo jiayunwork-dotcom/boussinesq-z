@@ -101,12 +101,3 @@ func PressureResult(l Load, influence float64) Result {
 		Vertical:  l.Q * influence,
 	}
 }
-
-var lastVertical float64
-
-func accumulateVertical(result Result) Result {
-	combined := lastVertical + result.Vertical
-	lastVertical = combined
-	result.Vertical = combined
-	return result
-}

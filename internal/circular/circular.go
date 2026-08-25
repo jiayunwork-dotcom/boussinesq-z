@@ -36,7 +36,7 @@ func (s *Store) Evaluate(l Load) (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
-	return accumulateVertical(PressureResult(l, influence)), nil
+	return PressureResult(l, influence), nil
 }
 
 func (s *Store) Reload() (*Table, error) {
