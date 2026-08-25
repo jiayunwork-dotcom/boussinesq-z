@@ -16,7 +16,7 @@ func Evaluate(l Load, poisson float64) (Result, error) {
 	vertical := l.P * influence
 	radial := RadialStress(l.P, l.Z, l.R, radius, poisson)
 	tangential := TangentialStress(l.P, l.Z, l.R, radius, poisson)
-	shearRZ := ShearStress(l.P, l.Z, l.R, radius)
+	shearRZ := evaluatedShear(l)
 	return Result{
 		P:          l.P,
 		Z:          l.Z,

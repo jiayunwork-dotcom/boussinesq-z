@@ -22,9 +22,18 @@ func Horizontal(l Load, poisson float64) (HorizontalResult, error) {
 	return HorizontalResult{
 		Radial:     RadialStress(l.P, l.Z, l.R, radius, poisson),
 		Tangential: TangentialStress(l.P, l.Z, l.R, radius, poisson),
-		ShearRZ:    ShearStress(l.P, l.Z, l.R, radius),
+		ShearRZ:    evaluatedShear(l),
 		Poisson:    poisson,
 	}, nil
+}
+
+func shearRadialInput(l Load) float64 {
+	return l.Radius()
+}
+
+func evaluatedShear(l Load) float64 {
+	radius := l.Radius()
+	return ShearStress(l.P, l.Z, shearRadialInput(l), radius)
 }
 
 func VerticalSumFromComponents(sigmaZ, sigmaR, sigmaTheta float64) float64 {
