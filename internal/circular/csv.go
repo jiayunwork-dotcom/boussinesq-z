@@ -101,25 +101,24 @@ func parseFloats(values []string) ([]float64, error) {
 	return out, nil
 }
 
-func TableCSVText(table Table) (string, error) {
-	var b strings.Builder
-	writer := csv.NewWriter(&b)
-	header := []string{"r/z"}
-	for _, value := range table.ZVals {
-		header = append(header, strconv.FormatFloat(value, 'g', -1, 64))
+func writeCSVRecords(writer *csv.Writer, records [][]string) error {
+	for _, record := range records {
+		if err := writer.Write(record); err != nil {
+			return err
+		}
 	}
-	if err := writer.Write(header); err != nil {
+	return finalizeCSVWriter(writer)
+}
+
+func TableCSVText(table Table) (string, error) {
+	records, err := table.csvRecords()
+	if err != nil {
 		return "", err
 	}
-	for i, row := range table.Data {
-		record := []string{strconv.FormatFloat(table.RVals[i], 'g', -1, 64)}
-		for _, value := range row {
-			record = append(record, strconv.FormatFloat(value, 'g', -1, 64))
-		}
-		if err := writer.Write(record); err != nil {
-			return "", err
-		}
+	var b strings.Builder
+	writer := csv.NewWriter(&b)
+	if err := writeCSVRecords(writer, records); err != nil {
+		return "", err
 	}
-	writer.Flush()
-	return b.String(), writer.Error()
+	return b.String(), nil
 }

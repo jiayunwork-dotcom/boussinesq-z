@@ -1,8 +1,10 @@
 package circular
 
 import (
+	"encoding/csv"
 	"fmt"
 	"math"
+	"strconv"
 )
 
 type Table struct {
@@ -70,6 +72,29 @@ func indexFor(values []float64, target float64) [2]int {
 		right++
 	}
 	return [2]int{right - 1, right}
+}
+
+func (t Table) csvRecords() ([][]string, error) {
+	if err := t.Validate(); err != nil {
+		return nil, err
+	}
+	header := []string{"r/z"}
+	for _, value := range t.ZVals {
+		header = append(header, strconv.FormatFloat(value, 'g', -1, 64))
+	}
+	records := [][]string{header}
+	for i, row := range t.Data {
+		record := []string{strconv.FormatFloat(t.RVals[i], 'g', -1, 64)}
+		for _, value := range row {
+			record = append(record, strconv.FormatFloat(value, 'g', -1, 64))
+		}
+		records = append(records, record)
+	}
+	return records, nil
+}
+
+func finalizeCSVWriter(writer *csv.Writer) error {
+	return writer.Error()
 }
 
 func (t Table) Snapshot() map[string]interface{} {
