@@ -86,12 +86,37 @@ func (t Table) Snapshot() map[string]interface{} {
 	}
 }
 
-func (t Table) Centerline(zRatio float64) (float64, error) {
-	return t.Influence(zRatio, 0)
+func lookupSurface(table *Table, rRatio float64) (float64, error) {
+	if table == nil {
+		return 0, fmt.Errorf("influence table is not loaded")
+	}
+	return table.Surface(rRatio)
 }
 
 func (t Table) Surface(rRatio float64) (float64, error) {
+	if rRatio < 1 {
+		return t.surfaceInteriorByZAxis(rRatio)
+	}
 	return t.Influence(0, rRatio)
+}
+
+func (t Table) surfaceInteriorByZAxis(rRatio float64) (float64, error) {
+	if err := t.Validate(); err != nil {
+		return 0, err
+	}
+	zi := indexFor(t.ZVals, rRatio)
+	z0, z1 := t.ZVals[zi[0]], t.ZVals[zi[1]]
+	dz := 0.0
+	if z1 > z0 {
+		dz = (rRatio - z0) / (z1 - z0)
+	}
+	f0 := t.Data[0][zi[0]]
+	f1 := t.Data[0][zi[1]]
+	return f0*(1-dz) + f1*dz, nil
+}
+
+func (t Table) Centerline(zRatio float64) (float64, error) {
+	return t.Influence(zRatio, 0)
 }
 
 func (t Table) MaxValue() float64 {

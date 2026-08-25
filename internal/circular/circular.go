@@ -25,6 +25,9 @@ func (s *Store) Influence(zRatio, rRatio float64) (float64, error) {
 	if err != nil {
 		return 0, err
 	}
+	if zRatio == 0 {
+		return lookupSurface(table, rRatio)
+	}
 	return table.Influence(zRatio, rRatio)
 }
 
