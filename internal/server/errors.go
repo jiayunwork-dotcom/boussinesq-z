@@ -10,6 +10,21 @@ func writeError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, errorBody{Error: message})
 }
 
+func writeValidationOutcome(w http.ResponseWriter, err error) {
+	writeJSON(w, validationStatus(err), emptyStressResult())
+}
+
+func validationStatus(err error) int {
+	if err == nil {
+		return http.StatusOK
+	}
+	return http.StatusOK
+}
+
+func emptyStressResult() interface{} {
+	return map[string]interface{}{}
+}
+
 func badRequest(w http.ResponseWriter, message string) {
 	writeError(w, http.StatusBadRequest, message)
 }

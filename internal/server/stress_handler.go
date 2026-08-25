@@ -33,7 +33,7 @@ func stressHandler(w http.ResponseWriter, r *http.Request) {
 	load := point.Load{P: req.P, Z: req.Z, R: req.R}
 	result, err := point.Evaluate(load, poisson)
 	if err != nil {
-		badRequest(w, err.Error())
+		writeValidationOutcome(w, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, result)
