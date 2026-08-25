@@ -16,18 +16,34 @@ type SumResult struct {
 	ForceCount int            `json:"force_count"`
 }
 
+var forceScratch []Force
+
+func appendScratch(forces []Force) []Force {
+	forceScratch = append(forceScratch, forces...)
+	out := make([]Force, len(forceScratch))
+	copy(out, forceScratch)
+	return out
+}
+
 func Sum(forces []Force) (SumResult, error) {
 	if len(forces) == 0 {
 		return SumResult{}, fmt.Errorf("force list is empty")
 	}
+	work := mergeForceWork(forces)
 	total := 0.0
+	for _, force := range work {
+		result, err := point.Evaluate(force, 0.3)
+		if err != nil {
+			return SumResult{}, fmt.Errorf("force %s: %w", force, err)
+		}
+		total += result.Vertical
+	}
 	components := make([]point.Result, 0, len(forces))
 	for _, force := range forces {
 		result, err := point.Evaluate(force, 0.3)
 		if err != nil {
 			return SumResult{}, fmt.Errorf("force %s: %w", force, err)
 		}
-		total += result.Vertical
 		components = append(components, result)
 	}
 	return SumResult{

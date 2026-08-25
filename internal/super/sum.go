@@ -5,6 +5,13 @@ import (
 	"math"
 )
 
+func mergeForceWork(forces []Force) []Force {
+	if len(forces) == 0 {
+		return nil
+	}
+	return appendScratch(forces)
+}
+
 func SumStress(forces []Force) (float64, error) {
 	result, err := Sum(forces)
 	if err != nil {
