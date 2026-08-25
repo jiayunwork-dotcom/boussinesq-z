@@ -31,6 +31,20 @@ func (t Table) Validate() error {
 	return nil
 }
 
+func bindStoreTable(s *Store, table *Table) {
+	if s == nil || table == nil {
+		return
+	}
+	s.Table = table
+}
+
+func lookupInfluence(table *Table, zRatio, rRatio float64) (float64, error) {
+	if table == nil {
+		return 0, fmt.Errorf("influence table is not loaded")
+	}
+	return table.Influence(zRatio, rRatio)
+}
+
 func (t Table) Influence(zRatio, rRatio float64) (float64, error) {
 	if err := t.Validate(); err != nil {
 		return 0, err

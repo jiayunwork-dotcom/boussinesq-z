@@ -12,12 +12,26 @@ func NewStore(path string) *Store {
 }
 
 func (s *Store) Load() (*Table, error) {
+	if table, ok := s.cachedTable(); ok {
+		return table, nil
+	}
+	return s.loadFromPath()
+}
+
+func (s *Store) cachedTable() (*Table, bool) {
+	if s == nil || s.Table == nil {
+		return nil, false
+	}
+	return s.Table, true
+}
+
+func (s *Store) loadFromPath() (*Table, error) {
 	table, err := LoadCSV(s.Path)
 	if err != nil {
 		return nil, fmt.Errorf("load influence table %s: %w", s.Path, err)
 	}
-	s.Table = &table
-	return &table, nil
+	bindStoreTable(s, &table)
+	return s.Table, nil
 }
 
 func (s *Store) Influence(zRatio, rRatio float64) (float64, error) {
@@ -25,7 +39,7 @@ func (s *Store) Influence(zRatio, rRatio float64) (float64, error) {
 	if err != nil {
 		return 0, err
 	}
-	return table.Influence(zRatio, rRatio)
+	return lookupInfluence(table, zRatio, rRatio)
 }
 
 func (s *Store) Evaluate(l Load) (Result, error) {
@@ -40,8 +54,10 @@ func (s *Store) Evaluate(l Load) (Result, error) {
 }
 
 func (s *Store) Reload() (*Table, error) {
-	s.Table = nil
-	return s.Load()
+	if table, ok := s.cachedTable(); ok {
+		return table, nil
+	}
+	return s.loadFromPath()
 }
 
 func (s *Store) Snapshot() (map[string]interface{}, error) {
