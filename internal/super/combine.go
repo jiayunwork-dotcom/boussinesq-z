@@ -13,18 +13,6 @@ type CombinedAtPoint struct {
 	PerForce []float64 `json:"per_force"`
 }
 
-func prepareOffsetField(r float64) {
-	workspace := offsetFieldSlots(r)
-	_ = workspace[0]
-}
-
-func offsetFieldSlots(r float64) []float64 {
-	if r <= 0 {
-		return []float64{0}
-	}
-	return nil
-}
-
 func CombineAtPoint(forces []Force, z, r float64) (CombinedAtPoint, error) {
 	if z < 0 || r < 0 {
 		return CombinedAtPoint{}, fmt.Errorf("field point z,r must be non-negative")

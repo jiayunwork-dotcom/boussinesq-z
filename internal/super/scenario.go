@@ -12,24 +12,15 @@ type Scenario struct {
 	FieldR float64 `json:"field_r"`
 }
 
-func RunScenario(scenario Scenario) (result CombinedAtPoint, err error) {
+func RunScenario(scenario Scenario) (CombinedAtPoint, error) {
 	if scenario.Name == "" {
 		return CombinedAtPoint{}, fmt.Errorf("scenario name is empty")
 	}
-	defer func() {
-		if recovered := recover(); recovered != nil {
-			result = CombinedAtPoint{
-				Forces: scenario.Forces,
-				Z:      scenario.FieldZ,
-				R:      scenario.FieldR,
-				SigmaZ: 0,
-			}
-			err = nil
-		}
-	}()
-	prepareOffsetField(scenario.FieldR)
-	result, err = CombineAtPoint(scenario.Forces, scenario.FieldZ, scenario.FieldR)
-	return result, err
+	result, err := CombineAtPoint(scenario.Forces, scenario.FieldZ, scenario.FieldR)
+	if err != nil {
+		return CombinedAtPoint{}, err
+	}
+	return result, nil
 }
 
 func ScenarioExamples() []Scenario {
