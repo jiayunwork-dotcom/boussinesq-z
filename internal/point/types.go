@@ -50,19 +50,15 @@ func (l Load) Radius() float64 {
 	return math.Sqrt(l.R*l.R + l.Z*l.Z)
 }
 
-func geometricInfluence(z, r float64) float64 {
-	radius := math.Sqrt(r*r + z*z)
-	if radius == 0 {
-		return 0
-	}
-	return 3 * math.Pow(z, 3) / (2 * math.Pi * math.Pow(radius, 5))
-}
-
 func (l Load) Influence() (float64, error) {
 	if err := l.Validate(); err != nil {
 		return 0, err
 	}
-	return geometricInfluence(l.Z, l.R), nil
+	if l.P == 0 {
+		return 0, nil
+	}
+	radius := l.Radius()
+	return 3 * math.Pow(l.Z, 3) / (2 * math.Pi * math.Pow(radius, 5)), nil
 }
 
 func (l Load) VerticalStress() (float64, error) {

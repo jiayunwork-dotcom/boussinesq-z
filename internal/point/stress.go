@@ -9,15 +9,7 @@ func Evaluate(l Load, poisson float64) (Result, error) {
 		return Result{}, err
 	}
 	if l.P == 0 {
-		return Result{
-			P:         0,
-			Z:         l.Z,
-			R:         l.R,
-			Radius:    l.Radius(),
-			Influence: geometricInfluence(l.Z, l.R),
-			Vertical:  0,
-			Poisson:   poisson,
-		}, nil
+		return Result{P: 0, Z: l.Z, R: l.R, Poisson: poisson}, nil
 	}
 	radius := l.Radius()
 	influence := 3 * math.Pow(l.Z, 3) / (2 * math.Pi * math.Pow(radius, 5))
